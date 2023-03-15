@@ -99,3 +99,13 @@ The result is a table with 1,599,449 rows with address and amount.
 From GCP the results can be exported to Google Drive or to a BigQuery table - up to you how you want to process the data.  
 
 Next is to apply the weighted average formula above - that you can adapt according to your risk criteria.
+
+The risk score for USDC is therefore 2.3%. 
+
+This approach can be used for all ERC20 tokens on any EVM chain.
+
+## How does it relate to DeFi?
+
+I started to look at applying this to DeFi protocols, such as [Uniswap](https://uniswap.org/), 
+using the positions based on the [NFTs minted](https://opensea.io/collection/uniswap-v3-positions).  
+It turns out that for a given pool, the pool risk is more or less equivalent to the tokens risks that constitute that pool.
