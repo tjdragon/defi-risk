@@ -71,4 +71,4 @@ $Risk Score = \sum_{i=1}^n \frac{r_i n_i}{N}$
 
 $\sqrt{3x-1}+(1+x)^2$
 
-$ \sum_{k=1}^n a_k b_k) $
+$\sum_{k=1}^n a_k b_k$
