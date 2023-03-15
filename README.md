@@ -68,3 +68,34 @@ Next is to assign a numerical risk score for each value: unknown = 0, low = 10, 
 We can use a simple weighted average formula to define the "riskiness" of a token: 
 
 $$Risk Score = \sum_{i=1}^n \frac{r_i n_i}{N}$$
+
+### Find all USDC holders and amounts
+
+This is the query to run on GCP:
+
+```sql
+select address, sum(value) as balance from
+    (
+        select token_address,
+               to_address as address,
+               cast(value as bignumeric) as value,
+        from `bigquery-public-data.crypto_ethereum.token_transfers`
+
+        union all
+
+        select token_address,
+            from_address as address,
+            -cast(value as bignumeric) as value,
+        from `bigquery-public-data.crypto_ethereum.token_transfers`
+    )
+where token_address = lower('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48')
+group by address
+having balance > 0
+order by balance desc;
+```
+
+This query will process 190.93 GB when run (at this time of writing), took 13 seconds to execute.  
+The result is a table with 1,599,449 rows with address and amount.  
+From GCP the results can be exported to Google Drive or to a BigQuery table - up to you how you want to process the data.  
+
+Next is to apply the weighted average formula above - that you can adapt according to your risk criteria.
