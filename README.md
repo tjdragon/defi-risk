@@ -67,6 +67,4 @@ or [Chainalysis](https://www.chainalysis.com/), you can get a risk score in the 
 Next is to assign a numerical risk score for each value: unknown = 0, low = 10, medium = 25 and high = 100 for example.  
 We can use a simple weighted average formula to define the "riskiness" of a token: 
 
-**The Cauchy-Schwarz Inequality**
-
-$$\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$$
+$Risk Score = \sum_{i=1}^n = \frac{r_i * n_i}{N}
