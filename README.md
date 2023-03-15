@@ -68,3 +68,5 @@ Next is to assign a numerical risk score for each value: unknown = 0, low = 10, 
 We can use a simple weighted average formula to define the "riskiness" of a token: 
 
 $$Risk Score = \sum_{i=1}^n = \frac{r_i * n_i}{N}
+
+$\sqrt{3x-1}+(1+x)^2$
