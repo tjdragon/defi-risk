@@ -1,7 +1,7 @@
 # DeFi Risk
 
 What is the best approach to DeFi risk?  
-March, 15th 2023
+March, 16th 2023
 
 ## Intro
 
