@@ -123,3 +123,6 @@ So, how exactly would one assess DeFi risk?
 
 A carefully crafted and comprehensive analysis, backed by reliable data and expert insights, is undoubtedly the most effective means 
 of evaluating potential risks and vulnerabilities within the DeFi ecosystem.
+
+Thank you to [Yannick Cherel](https://www.linkedin.com/in/yannick-cherel-8b20933/) and [Lucy Janaudy](https://www.linkedin.com/in/lucy-janaudy/)
+for their contributions.
