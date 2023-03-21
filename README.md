@@ -1,37 +1,33 @@
 # DeFi Risk
 
-What is the best approach to DeFi risk?  
-March, 16th 2023
+March, 15th 2023
 
 ## Intro
 
-Decentralised Finance (DeFi) is about enabling digital assets based transactions, 
-exchanges and financial services  
-DeFi's core premise is that there is no centralized authority to dictate or control operations.  
-
-But how to assess DeFi risk, specifically risk related to cyber-crime?
+Decentralized Finance, or DeFi, centers around empowering transactions, exchanges, and financial services based on digital assets.  
+The fundamental principle of DeFi is the absence of a centralized authority to govern or manipulate operations.  
+In the context of financial crime risk, this brief article proposes an approach to evaluating DeFi while remaining mindful of your risk appetite.
 
 ## Token risk
 
-We will first start by looking at token risk. For the rest of this article, tokens relate
-to ERC20 tokens on the Ethereum ecosystem, but the same principal would apply elsewhere.  
+We will first start by looking at token risk (from a financial crime lens).  
+For the rest of this article, tokens relate to ERC20 tokens on the Ethereum ecosystem.
 
 ### An ERC20 primer
 The [ERC20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) standard does not allow to list
-all its participants, meaning it is possible to say how much tokens an address has, but it is not possible
-using the standard ERC20 functions to list all the holders of that token.  
+all its holders, meaning it is possible to say how many tokens an address holds ('balanceOf'), but it is not possible
+using the standard ERC20 functions to list all the holders of a given token.  
+For this, we need to rely on the ['transfer' events](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-Transfer-address-address-uint256-) 
+and use an archive node to be able to get all the incoming and outgoing transfers.  
 
-For this, we need to rely on the 'transfer' events. For this we need to use an archive node to be able to 
-get all the events in and out from an ERC20.  
-
-### Querying the data
-There are a couple of ways to do this, the DIY version, which I do not recommend, the use of [TheGraph](https://thegraph.com/) which
+### Querying the data: list all holders
+There are a couple of ways to do this, the DIY version, the use of [TheGraph](https://thegraph.com/) which
 is not the faint-hearted, and the one I have used, the lazy but very powerful and efficient option: [GCP](https://cloud.google.com/).  
 
 Google has made several blockchain databases available that can be queried using [BigQuery](https://cloud.google.com/bigquery).  
 
 #### Example 1: Top 10 ETH addresses by balance
-Follows an example to get the top 10 addresses by balance on Ethereum:
+The following query returns the top 10 addresses by balance on Ethereum:
 
 ```sql
 select *
@@ -45,7 +41,7 @@ The first address being returned is [0x00000000219ab540356cbb839cbe05303d7705fa]
 the deposit smart contract for staked ETHs (17+ million ETH).
 
 #### Example 2: Distinct USDC holders
-Follows an example to returns the number of 'TO' addresses USDC ([0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)) has been 
+The following query returns the number of recipient addresses USDC ([0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)) have been 
 transferred to.
 
 ```sql
@@ -54,22 +50,26 @@ where token_address = lower('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48');
 ```
 
 This query processes 112.66 GB and took 4 seconds to run.  
-The result is 10,668,152 addresses.
+The result is 10,668,152 addresses (one holder may own multiple addresses).
 
-## How risky is USDC?
+## How risky is a given token?
 
-How do I define "risky"? Risky here means that out of all the holders of USDC, if we assign a risk score per address,
-how would derive a risk score for the token?  
+How do I define "risky" - from a financial crime point-of-view?  
+Risky here means that out of all the holders of a given token, if we assign a risk score per address, 
+how would one derive a risk score for that token?  
+(Please note that there are several [categories](https://academy.chainalysis.com/risky-typologies) of risk: sanctions, child abuse, darknet, fraud, ransomware, terrorist financing, ...)  
 
-In order to do so, we first need to get all holders of a token and the notional per holder. We will use GCP for this.  
-Next, we need to derive a risk score per address. Using either [TRM Labs](https://www.trmlabs.com/), [Elliptic](https://www.elliptic.co/) 
-or [Chainalysis](https://www.chainalysis.com/), you can get a risk score in the form of 'unknown', 'low', 'medium' or 'high'.  
-Next is to assign a numerical risk score for each value: unknown = 0, low = 10, medium = 25 and high = 100 for example.  
+We first need to get all holders of a token and the notional per holder; we will use GCP for this.  
+Next, we derive a risk score per address, using either [TRM Labs](https://www.trmlabs.com/), [Elliptic](https://www.elliptic.co/)
+or [Chainalysis](https://www.chainalysis.com/).
+
+Each risk level 'unknown', 'low', 'medium' or 'high' is assigned a numerical value:  unknown = 0, low = 10, medium = 25 and high = 100 
+for example.  
 We can use a simple weighted average formula to define the "riskiness" of a token: 
 
 $$Risk Score = \sum_{i=1}^n \frac{r_i n_i}{N}$$
 
-### Find all USDC holders and amounts
+### Find all token holders and amounts
 
 This is the query to run on GCP:
 
@@ -100,16 +100,26 @@ From GCP the results can be exported to Google Drive or to a BigQuery table - up
 
 Next is to apply the weighted average formula above - that you can adapt according to your risk criteria.
 
-The risk score for USDC is therefore 3.59%.  
+The risk score for this token is therefore 3.59%.  
 By risk, this was the allocation of holders: unknown=1,399,484, lowRisk=196,956, highRisk=3,009.
 
 This approach can be used for all ERC20 tokens on any EVM chain.
 
 ## How does it relate to DeFi?
 
-I started to look at applying this to DeFi protocols, such as [Uniswap](https://uniswap.org/), 
-using the positions based on the [NFTs minted](https://opensea.io/collection/uniswap-v3-positions).  
-It turns out that for a given pool, the pool risk is more or less equivalent to the tokens risks that constitute that pool.  
+When applied to DeFi protocols, such as [Uniswap](https://uniswap.org/), 
+using the positions based on the [NFTs minted](https://opensea.io/collection/uniswap-v3-positions), 
+it turns out that for a given pool, the pool risk is more or less equivalent to the tokens risks that constitute that pool.
 
 ## Conclusion
-I believe that only a statistical approach to public permission-less DeFi is possible. What's your view?
+By utilizing a statistical approach, we can effectively gauge the risk level of a public permission-less DeFi protocol 
+or set of tokens over time.  
+This method allows us to establish a metric that can be tracked and monitored, providing valuable insights into the 
+perceived "riskiness" of a given system.  
+Of course, it's important to note that each protocol may require a customized approach, and a thorough examination of other potential hazards, 
+including cyber-risks, may also be necessary.  
+
+So, how exactly would one assess DeFi risk?  
+
+A carefully crafted and comprehensive analysis, backed by reliable data and expert insights, is undoubtedly the most effective means 
+of evaluating potential risks and vulnerabilities within the DeFi ecosystem.
